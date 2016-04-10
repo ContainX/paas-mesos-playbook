@@ -1,0 +1,5 @@
+os_version: "{{ ansible_lsb.major_release if ansible_lsb is defined else ansible_distribution_version.split('.')[0] }}"
+os_version_major: "{{ os_version }}"
+
+mesosphere_releases:
+  '7': 'mesosphere-el-repo-7-1.noarch.rpm'

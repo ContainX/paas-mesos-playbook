@@ -1,0 +1,24 @@
+---
+- name: check installed java
+  shell: which java
+  register: java_is_installed
+  ignore_errors: yes
+  changed_when: false
+
+- name: check version
+  shell: java -version 2>&1 | grep -c 'build 1.{{ oracle_java_version }}.0_{{ oracle_java_version_update }}-b{{ oracle_java_build }}'
+  register: version_is_valid
+  ignore_errors: yes
+  changed_when: false
+
+- name: Download Oracle jdk
+  when: java_is_installed.rc == 1 or version_is_valid.rc == 1
+  shell: "curl -L  -H 'Cookie:oraclelicense=accept-securebackup-cookie' -o {{ src_dir }}/{{ oracle_java.rpm.filename }} {{ oracle_java.rpm.url }}"
+
+- name: install RPM
+  when: java_is_installed.rc == 1 or version_is_valid.rc == 1
+  shell: rpm  -ivh {{ src_dir }}/{{ oracle_java.rpm.filename }}
+
+- name: set Java version as default
+  when: java_is_installed.rc == 1 or version_is_valid.rc == 1
+  shell: alternatives --set java {{ oracle_java.home }}/jre/bin/java

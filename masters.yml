@@ -1,0 +1,10 @@
+---
+- hosts: masters
+  become: yes
+  roles:
+    - { role: 'ansible-java8',  tags: ['runtimes', 'java'] }
+    - { role: 'ansible-master',
+        install_chronos: false,
+        network_interface: "eth1",
+#        marathon_credentials: "admin:password",
+        tags: ['master'] }

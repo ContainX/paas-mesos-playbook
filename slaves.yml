@@ -1,0 +1,20 @@
+---
+- hosts: slaves
+  become: yes
+  roles:
+    - { role: 'ansible-java8', tags: ['runtimes', 'java'] }
+    - { role: 'ansible-docker',
+        ## Custom Docker Engine Options can be added below
+        docker_opts: '',
+        ## Using a private registry or private repos
+        ## Create a docker.tar.gz containing the .docker/config.json
+#        docker_login_tar: 'assets/docker.tar.gz',
+        weave_enabled: True,
+        ## Used for docker to docker DNS resolution.  Example mysql.mycompany.local
+        dns_domain: 'mycompany.local.',
+        tags: ['docker']
+      }
+    - { role: 'ansible-slave',
+        network_interface: "eth1",
+        tags: ['slave']
+      }

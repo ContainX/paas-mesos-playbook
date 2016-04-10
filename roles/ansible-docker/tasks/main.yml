@@ -1,0 +1,41 @@
+---
+
+- include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Create docker group
+  group: name=docker state=present system=yes
+  when: docker_create_group
+  tags:
+    - config
+
+- name: Create the docker group and add your user
+  command: usermod -aG docker {{ansible_ssh_user}}
+  when: docker_create_group
+  changed_when: false
+  tags:
+    - config
+
+- name: Update Docker Opts - Weave
+  set_fact:
+    docker_opts: "{{docker_opts}}  {{weave_dns_opts}}"
+  when: weave_enabled == True
+
+- name: Update Docker Opts - Global Networking
+  set_fact:
+    docker_opts: "{{docker_opts}}  {{cluster_kv_opts}}"
+  when: network_global_enabled == True
+
+- include: Debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: RedHat.yml
+  when: ansible_os_family == "RedHat"
+
+- name: Copy Mesos Docker login if defined
+  copy: src={{ docker_login_tar }} dest=/etc/docker.tar.gz owner=root
+  when: docker_login_tar != ""
+
+- include: common.yml
+
+- include: weave.yml
+  when: weave_enabled == True

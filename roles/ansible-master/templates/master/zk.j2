@@ -1,0 +1,8 @@
+{% if network_interface != '' %}
+zk://{% set comma = joiner(',') %}
+{% for item in groups.masters -%}
+  {{ comma() }}{{ hostvars[item][ansible_network_interface]['ipv4']['address'] }}:2181
+{%- endfor %}/mesos
+{% else %}
+zk://{{ groups.masters | join(':2181,') }}:2181/mesos
+{% endif %}

@@ -1,0 +1,21 @@
+MARATHON_ZK={% if network_interface != '' %}
+zk://{% set comma = joiner(',') %}
+{% for item in groups.slaves -%}
+  {{ comma() }}{{ hostvars[item][ansible_network_interface]['ipv4']['address'] }}:2181
+{%- endfor %}/marathon
+{% else %}
+zk://{{ groups.masters | join(':2181,') }}:2181/marathon
+{% endif %}
+
+MARATHON_MASTER={% if network_interface != '' %}
+zk://{% set comma = joiner(',') %}
+{% for item in groups.slaves -%}
+  {{ comma() }}{{ hostvars[item][ansible_network_interface]['ipv4']['address'] }}:2181
+{%- endfor %}/mesos
+{% else %}
+zk://{{ groups.masters | join(':2181,') }}:2181/mesos
+{% endif %}
+
+{% if marathon_credentials != '' %}
+MARATHON_HTTP_CREDENTIALS={{ marathon_credentials }}
+{% endif %}

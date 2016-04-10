@@ -1,0 +1,8 @@
+---
+# Containerizer
+mesos_containerizers: "docker,mesos"
+mesos_executor_timeout: "5mins"
+mesos_resources: "ports(*):[3000-4900, 7000-9000, 31000-32000]"
+docker_stop_timeout: "15secs"
+slave_attributes: "rack:1"
+network_interface: ""

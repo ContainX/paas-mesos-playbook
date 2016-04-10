@@ -1,0 +1,13 @@
+---
+- name: Add the repository
+  yum: name=http://repos.mesosphere.com/el/7/noarch/RPMS/mesosphere-el-repo-7-1.noarch.rpm
+
+- name: Install mesos
+  yum: name=mesos update_cache=yes
+
+- name: Stop mesos-master
+  service: name=mesos-master state=stopped
+
+- name: Disable mesos-master
+  command: systemctl disable mesos-master.service
+  changed_when: false

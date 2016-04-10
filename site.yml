@@ -1,0 +1,4 @@
+---
+- hosts: all
+- include: masters.yml
+- include: slaves.yml

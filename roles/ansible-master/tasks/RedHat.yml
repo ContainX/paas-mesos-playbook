@@ -1,0 +1,68 @@
+---
+- name: Add the repository
+  yum: name={{ mesosphere_yum_repo }}
+
+- name: Install mesos and marathon
+  yum: name={{item}} update_cache=yes
+  with_items:
+    - mesos
+    - marathon
+
+- name: Install Chronos if requested
+  yum: name=chronos
+  when: install_chronos == true
+
+- name: Install zookeeper
+  yum: name={{ zookeeper_pkg_names[os_version_major] }}
+
+- name: Set zookeeper ID
+  template: src=zookeeper/myid.j2 dest=/var/lib/zookeeper/myid
+  notify:
+    - Restart zookeeper
+
+- name: Append zookeeper IP addresses
+  lineinfile: 
+    dest: /etc/zookeeper/conf/zoo.cfg 
+    line: "server.{{ hostvars[item].zoo_id }}={{ item }}:2888:3888"
+    regexp: "^server.{{ hostvars[item].zoo_id }}"
+  with_items: "{{ groups.masters }}"
+  notify:
+    - Restart zookeeper
+
+- name: Set marathon
+  template: src=master/marathon.j2 dest=/etc/sysconfig/marathon
+  notify:
+    - Restart marathon
+
+- name: Set zookeeper address for mesos
+  template: src=master/zk.j2 dest=/etc/mesos/zk
+  notify:
+    - Restart mesos-master
+    - Restart marathon
+
+- name: Ensures /etc/systemd/system/mesos-master.service.d dir exists
+  file: path=/etc/systemd/system/mesos-master.service.d state=directory
+
+- name: Set LIBPROCESS
+  template: src=master/mesos-sysd-conf.j2 dest=/etc/systemd/system/mesos-master.service.d/mesos.conf
+  notify:
+    - Restart mesos-master
+
+- name: Stop mesos-slave
+  service: name=mesos-slave state=stopped
+
+- name: Disable mesos-slave for version 7
+  command: systemctl disable mesos-slave.service
+  changed_when: false
+
+- name: Start services
+  service: name={{item}} state=started
+  with_items:
+    - zookeeper
+    - mesos-master
+    - marathon
+
+- name: Start Chronos
+  service: name=chronos state=started
+  when: install_chronos == true
+

@@ -1,0 +1,44 @@
+---
+
+- name: Check if sysconfig docker exists
+  stat: path=/etc/sysconfig/docker
+  register: sysconfig_docker
+
+- name: Check if default docker exists
+  stat: path=/etc/default/docker
+  register: default_docker
+
+- name: Check if systemd exists
+  stat: path=/usr/lib/systemd/system/
+  register: systemd_check
+
+- name: Copy Weave shell script
+  copy: src=files/weave dest=/usr/bin/weave owner=root group=root mode=0755
+
+- name: Configure Docker DNS Settings for Network (Sysconfig)
+  lineinfile: "dest=/etc/sysconfig/docker regexp='OPTIONS=\\\"\\$OPTIONS --dns {{ dns_address }} --dns-search={{ dns_domain }}\\\"' backup=true line='OPTIONS=\"$OPTIONS --dns {{ dns_address }} --dns-search={{ dns_domain }}\"'"
+  when: sysconfig_docker.stat.exists == true
+  register: docker_weave_dns_status_el
+
+- name: Configure Docker DNS Settings for Network (Default Dir)
+  lineinfile: "dest=/etc/default/docker regexp='DOCKER_OPTS=\\\"\\$DOCKER_OPTS --dns {{ dns_address }} --dns-search={{ dns_domain }}\\\"' backup=true line='DOCKER_OPTS=\"$DOCKER_OPTS --dns {{ dns_address }} --dns-search={{ dns_domain }}\"'"
+  when: default_docker.stat.exists == true
+  register: docker_weave_dns_status
+
+- name: Restart Docker Daemon
+  service: name=docker state=restarted
+  when: docker_weave_dns_status or docker_weave_dns_status_el or changed
+
+- name: Check weave status
+  shell: /usr/bin/weave status
+  register: weave_status
+  changed_when: false #Since this is just info gathering, no need to report the change
+  ignore_errors: yes
+
+- name: Start Weave Router
+  shell: /usr/bin/weave launch-router --dns-domain={{ dns_domain }} {{ groups.slaves | join(' ') | replace(inventory_hostname, "") }}
+  when: "weave_status.stdout.find('Service: router') == -1"
+
+- name: Start Weave Plugin
+  shell: /usr/bin/weave launch-plugin
+  when: "weave_status.stdout.find('Service: plugin') == -1"

@@ -1,0 +1,37 @@
+---
+# RedHat: Docker yum repository URL
+docker_yum_repo: "https://yum.dockerproject.org/repo/main/{{ ansible_distribution | lower }}/{{ os_version_major }}"
+docker_yum_repo_gpg: 'https://yum.dockerproject.org/gpg'
+
+docker_opts: ''
+# Local path to a docker.tar.gz file used by Mesos for Docker hub/registry authentication
+docker_login_tar: ''
+docker_create_group: true
+docker_service_start_timeout: ''    # use system default value
+
+##### ---
+# Want to advertise the tcp port? Enable below.
+# To enable tcp you must set :
+#   - `docker_listen_tcp = True`
+#   - uncomment `docker_opts` or provide it as a override
+#
+# Note:
+#   By setting `-H` opt for docker, it will no longer be listening
+#   on the socket. You cannot have both. You must choose socket `-d`
+#   or tcp `-H`.
+#
+docker_listen_tcp: False
+docker_listen_port: 4243
+
+# Do not force if Docker is already installed
+docker_force_factory: False
+# docker_opts: '"-H tcp://{{ansible_eth1.ipv4.address}}:{{docker_listen_port}}"'
+
+# DNS / Networking
+weave_enabled: False
+network_global_enabled: False
+dns_address: "172.17.0.1"
+dns_domain: "docker.local"
+cluster_advertise: "eth1:2376"
+
+##### ---

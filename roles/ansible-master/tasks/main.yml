@@ -1,0 +1,36 @@
+---
+- include_vars: "{{ansible_os_family}}.yml"
+
+- include: Debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: RedHat.yml
+  when: ansible_os_family == "RedHat"
+
+- name: Set quorum
+  template: src=master/quorum.j2 dest=/etc/mesos-master/quorum
+  notify:
+    - Restart mesos-master
+
+- name: Set mesos-master hostname
+  template: src=hostname.j2 dest=/etc/mesos-master/hostname
+  notify:
+    - Restart mesos-master
+
+- name: Set mesos-master ip
+  template: src=master/ip.j2 dest=/etc/mesos-master/ip
+  notify:
+    - Restart mesos-master
+
+- name: Set mesos-master cluster
+  template: src=master/cluster.j2 dest=/etc/mesos-master/cluster
+  notify:
+    - Restart mesos-master
+
+- name: Ensure /etc/marathon/conf directory
+  file: path=/etc/marathon/conf state=directory
+
+- name: Set marathon hostname
+  template: src=hostname.j2 dest=/etc/marathon/conf/hostname
+  notify:
+    - Restart mesos-master

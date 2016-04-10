@@ -1,0 +1,9 @@
+[masters]
+10.142.142.10 zoo_id=1
+#10.142.142.11 zoo_id=2
+
+## Add slave in consecutive order - update the Vagrantfile loop to reflect the count below
+[slaves]
+10.142.142.21
+10.142.142.22
+#10.142.142.23

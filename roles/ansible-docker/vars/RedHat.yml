@@ -1,0 +1,3 @@
+os_version: "{{ ansible_lsb.major_release if ansible_lsb is defined else ansible_distribution_version.split('.')[0] }}"
+os_version_major: "{{ os_version }}"
+

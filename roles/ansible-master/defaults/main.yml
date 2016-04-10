@@ -1,0 +1,17 @@
+---
+mesosphere_yum_repo: "http://repos.mesosphere.com/el/{{ os_version_major }}/noarch/RPMS/{{ mesosphere_releases[os_version_major] }}"
+
+# If true, Chronos will be installed and started
+install_chronos: false
+
+# Mesos Clustername
+mesos_cluster_name: "dev_cluster"
+
+# Quorum Size
+mesos_quorum: "1"
+
+# Set this in scenarios where you want the cluster to communicate on a particular network
+network_interface: ""
+
+# Basic Marathon Authentication - blank = no authentication
+marathon_credentials: ""

@@ -1,0 +1,2 @@
+weave_dns_opts: "--dns {{ dns_address }} --dns-search={{ dns_domain }}"
+cluster_kv_opts: "--cluster-store=zk://{{ groups.masters | join(':2181,') }}:2181/ --cluster-advertise={{cluster_advertise}}"

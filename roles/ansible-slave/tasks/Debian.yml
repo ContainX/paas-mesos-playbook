@@ -1,0 +1,32 @@
+---
+- name: Add apt key for mesos
+  apt_key: keyserver=keyserver.ubuntu.com id=E56151BF
+
+- name: Set DISTRO variable
+  shell: "lsb_release -is | tr '[:upper:]' '[:lower:]'"
+  register: distro_var
+  changed_when: false
+
+- name: Set CODENAME variable
+  shell: "lsb_release -cs"
+  register: codename_var
+  changed_when: false
+
+- name: Add apt repository for mesos
+  apt_repository: repo="deb http://repos.mesosphere.com/{{ distro_var.stdout }} {{ codename_var.stdout }} main" update_cache=yes
+
+- name: Install mesos
+  apt: name=mesos update_cache=yes
+
+- name: Stop zookeeper
+  service: name=zookeeper state=stopped
+  
+- name: Disable zookeeper
+  copy: src=zookeeper.override dest=/etc/init/zookeeper.override
+
+- name: Stop mesos-master
+  service: name=mesos-master state=stopped
+
+- name: Disable mesos-master
+  copy: src=mesos-master.override dest=/etc/init/mesos-master.override
+

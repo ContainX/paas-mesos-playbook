@@ -1,0 +1,62 @@
+---
+- include_vars: "{{ansible_os_family}}.yml"
+
+- include: Debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: RedHat.yml
+  when: ansible_os_family == "RedHat"
+
+- name: Set zookeeper address for mesos
+  template: src=zk.j2 dest=/etc/mesos/zk
+  notify:
+    - Restart mesos-slave
+
+- name: Set hostname
+  template: src=hostname.j2 dest=/etc/mesos-slave/hostname
+  notify:
+    - Restart mesos-slave
+
+- name: Mesos containerizers
+  template: src=containerizers.j2 dest=/etc/mesos-slave/containerizers
+  notify:
+    - Restart mesos-slave
+
+- name: Mesos Resources
+  template: src=resources.j2 dest=/etc/mesos-slave/resources
+  notify:
+    - Restart mesos-slave
+
+- name: Mesos Attributes
+  template: src=attributes.j2 dest=/etc/mesos-slave/attributes
+  notify:
+    - Restart mesos-slave
+
+- name: Mesos Docker Stop Timeout
+  template: src=docker_stop_timeout.j2 dest=/etc/mesos-slave/docker_stop_timeout
+  notify:
+    - Restart mesos-slave
+
+- name: Mesos executor_registration_timeout
+  template: src=executor_registration_timeout.j2 dest=/etc/mesos-slave/executor_registration_timeout
+  notify:
+    - Restart mesos-slave
+
+- name: Set LIBPROCESS_IP env
+  lineinfile:
+    dest: /etc/default/mesos
+    regexp: "^LIBPROCESS_IP"
+    line: "LIBPROCESS_IP={{ inventory_hostname }}"
+  notify:
+    - Restart mesos-slave
+
+- name: Set LIBPROCESS_ADVERTISE_IP env
+  lineinfile:
+    dest: /etc/default/mesos
+    regexp: "^LIBPROCESS_ADVERTISE_IP"
+    line: "LIBPROCESS_ADVERTISE_IP={{ inventory_hostname }}"
+  notify:
+    - Restart mesos-slave
+
+- name: Start mesos-slave
+  service: name=mesos-slave state=started

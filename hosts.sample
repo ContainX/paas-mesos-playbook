@@ -1,0 +1,10 @@
+# Rename to hosts and use as ansible inventory
+
+[masters]
+mesos-master-fqdn-or-ip.mydomain.com zoo_id=1
+mesos-master2-fqdn-or-ip.mydomain.com zoo_id=2
+
+[slaves]
+mesos-slave-fqdn-or-ip.mydomain.com slave_attributes=rack:2;unit:B;gpu:true
+mesos-slave2-fqdn-or-ip.mydomain.com slave_attributes=rack:1;unit:A;gpu:false
+mesos-slave3-fqdn-or-ip.mydomain.com
