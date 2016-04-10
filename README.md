@@ -1,4 +1,4 @@
-# paas-mesos-playbook
+## Playbook for creating a Mesos, Marathon, Docker and Weave PaaS using Ansible
 
 This is a playbook which I use for deploying clusters utilizing the following technologies:
 
