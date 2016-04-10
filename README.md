@@ -10,6 +10,10 @@ This is a playbook which I use for deploying clusters utilizing the following te
 
 This playbook supports 1..N Mesos Master nodes and 1..N Mesos slave based nodes.
 
+### Additional Documentation
+
+See the blog entry and series related to this playbook at: [Eating my own Dog Food: Building a PaaS](http://jbu.io/2016/04/05/eating-my-own-dog-food-building-a-paas/)
+
 ## Using this playbook with Vagrant
 
 Out of the box after cloning this repo a simple ```vagrant up``` will create a single Master and 2 Slave cluster.  This cluster will create a weave network for docker to docker multi-host networking with a DNS name of *.mycompany.local.  
